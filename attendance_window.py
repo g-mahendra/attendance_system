@@ -81,56 +81,56 @@ class AttendanceWindow(QtGui.QMainWindow):
 
     def record(self):
         #to save video with the name self.e.text()
-        video = cv2.VideoCapture(0)
-        if (video.isOpened() == False): 
-            print("Error reading video file")
+        # video = cv2.VideoCapture(0)
+        # if (video.isOpened() == False): 
+        #     print("Error reading video file")
         
-        # We need to set resolutions.
-        # so, convert them from float to integer.
-        frame_width = int(video.get(3))
-        frame_height = int(video.get(4))
+        # # We need to set resolutions.
+        # # so, convert them from float to integer.
+        # frame_width = int(video.get(3))
+        # frame_height = int(video.get(4))
         
-        size = (frame_width, frame_height)
+        # size = (frame_width, frame_height)
         
-        # Below VideoWriter object will create
-        # a frame of above defined The output 
-        # is stored in 'filename.avi' file.
-        result = cv2.VideoWriter("videos/{}.mp4".format(self.e.text()), 
-                                cv2.VideoWriter_fourcc(*'MJPG'),
-                                10, size)
+        # # Below VideoWriter object will create
+        # # a frame of above defined The output 
+        # # is stored in 'filename.avi' file.
+        # result = cv2.VideoWriter("videos/{}.mp4".format(self.e.text()), 
+        #                         cv2.VideoWriter_fourcc(*'MJPG'),
+        #                         10, size)
             
-        while(True):
-            ret, frame = video.read()
+        # while(True):
+        #     ret, frame = video.read()
         
-            if ret == True: 
+        #     if ret == True: 
         
-                # Write the frame into the
-                # file 'filename.avi'
-                result.write(frame)
+        #         # Write the frame into the
+        #         # file 'filename.avi'
+        #         result.write(frame)
         
-                # Display the frame
-                # saved in the file
-                cv2.imshow('Frame', frame)
+        #         # Display the frame
+        #         # saved in the file
+        #         cv2.imshow('Frame', frame)
         
-                # Press S on keyboard 
-                # to stop the process
-                if cv2.waitKey(1) & 0xFF == ord('s'):
-                    break
+        #         # Press S on keyboard 
+        #         # to stop the process
+        #         if cv2.waitKey(1) & 0xFF == ord('s'):
+        #             break
         
-            # Break the loop
-            else:
-                break
+        #     # Break the loop
+        #     else:
+        #         break
         
-        # When everything done, release 
-        # the video capture and video 
-        # write objects
-        video.release()
-        result.release()
+        # # When everything done, release 
+        # # the video capture and video 
+        # # write objects
+        # video.release()
+        # result.release()
             
-        # Closes all the frames
-        cv2.destroyAllWindows()
+        # # Closes all the frames
+        # cv2.destroyAllWindows()
         
-        print("The video was successfully saved")
+        # print("The video was successfully saved")
         return
     
     def mark(self):
@@ -168,16 +168,23 @@ class AttendanceWindow(QtGui.QMainWindow):
         
     def extract_faces(self):
         i=0
+        lst = []
         face_cascade = cv2.CascadeClassifier("support_files/haarcascade_frontalface_default.xml")
         for eachImg in os.listdir("temp"):
             print(eachImg, 'read')
             img = cv2.imread("temp/" + eachImg, 0)
             faces = face_cascade.detectMultiScale(img) 
-            for(x,y,w,h) in faces:
-                sub_face = img[y:y+h, x:x+w]
-                face_file_name = "temp/presentFaces/face_" + str(i) + ".jpg"
-                cv2.imwrite(face_file_name,sub_face)
-                i=i+1
+            lst.append(faces)
+        print(lst)
+        faces = sorted(lst, key=lambda x:len(x))[-1]
+        for(x,y,w,h) in faces:
+            sub_face = img[y:y+h, x:x+w]
+            face_file_name = "temp/presentFaces/face_" + str(i) + ".jpg"
+            cv2.imwrite(face_file_name,sub_face)
+            print("i", i)
+            i=i+1
+            if len(faces) > 0:
+                break
         cv2.waitKey(0)
         cv2.destroyAllWindows()
         print (i, 'faces read')
