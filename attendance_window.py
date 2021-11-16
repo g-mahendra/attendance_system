@@ -34,30 +34,39 @@ class AttendanceWindow(QtGui.QMainWindow):
                              "background-color : blue;")
 
         #Label and Subject code entry
-        l=QtGui.QLabel(self)
-        l.setAlignment(QtCore.Qt.AlignCenter)
-        l.setGeometry(QtCore.QRect(275,140,250,30))
-        l.setStyleSheet("QLabel { background-color:green;color: white;}")
-        font=QtGui.QFont("Times",16,QtGui.QFont.Bold) 
-        l.setFont(font)
-        l.setText("ENTER SUB-CODE")
-        l.setStyleSheet("color:white;""border-style: solid;"
-                             "border-width: 2px;"
-                             "border-color: #000;"
-                             "background-color : green;"
-                             )
+        l1=QtGui.QLabel(self)
+        l1.setAlignment(QtCore.Qt.AlignCenter)
+        l1.setGeometry(QtCore.QRect(200,150,130,30))
+        l1.setStyleSheet("QLabel { background-color : #DDD;color :black ; }")
+        font=QtGui.QFont("Times",14,QtGui.QFont.Bold)
+        l1.setFont(font)
+        l1.setText("Enter Year")
 
-        self.e = QtGui.QLineEdit(self)
-        self.e.setGeometry(275,175,250,50)
-        self.e.setAlignment(QtCore.Qt.AlignCenter)
-        self.e.setFont(QtGui.QFont("Times",18,QtGui.QFont.Bold))
+        self.e1=QtGui.QLineEdit(self)
+        self.e1.setGeometry(350,150,300,30)
+        self.e1.setAlignment(QtCore.Qt.AlignCenter)
+        font1=QtGui.QFont("Arial",14)
+        self.e1.setFont(font1)
 
+        #Taking Student's Registration Number
+        l2=QtGui.QLabel(self)
+        l2.setAlignment(QtCore.Qt.AlignCenter)
+        l2.setGeometry(QtCore.QRect(200,250,175,30))
+        l2.setStyleSheet("QLabel { background-color : #DDD;color :black ; }")
+        l2.setFont(font)
+        l2.setText("Enter Subject Code")
+
+        self.e2=QtGui.QLineEdit(self)
+        self.e2.setGeometry(400,250,300,30)
+        self.e2.setAlignment(QtCore.Qt.AlignCenter)
+        self.e2.setFont(font1)
+        
         #Recording Button
         b1=QtGui.QPushButton(self)
         b1.setText("RECORD AND MARK")
         b1.setStyleSheet("QPushButton { background-color : #DDD;color : black ; }")
         b1.setFont(font)
-        b1.setGeometry(250,300,300,50)
+        b1.setGeometry(100,500,280,30)
         b1.clicked.connect(self.record_and_mark)
 
         #Check Attendance button to check specific subject's Attendance
@@ -65,13 +74,13 @@ class AttendanceWindow(QtGui.QMainWindow):
         b2.setText("CHECK ATTENDANCE")
         b1.setStyleSheet("QPushButton { background-color : #DDD;color : black ; }")
         b2.setFont(font)
-        b2.setGeometry(250,425,300,50)
+        b2.setGeometry(400,500,280,30)
         b2.clicked.connect(self.create_check_attendance)
         
     def create_check_attendance(self):
         #To check Validity of Subject Code 
         sub=["IT301","IT302"] #TO DO - GET THESE FROM TABLE
-        if self.e.text() in sub:
+        if self.e2.text() in sub:
             self._check_attendance = CheckAttendance(self.e.text())
             self._check_attendance.show()
 

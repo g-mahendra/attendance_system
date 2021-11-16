@@ -116,7 +116,7 @@ class RegistrationWindow(QtGui.QMainWindow):
         self.l4.setText("")
     
     def take_photo(self):
-        #Function for clicking,displaying and storing photo
+    #Function for clicking,displaying and storing photo
         check_value = self.check()
         if (check_value == 1):
             self.l4.setGeometry(QtCore.QRect(40,500,250,30))
@@ -131,25 +131,23 @@ class RegistrationWindow(QtGui.QMainWindow):
             face_cascade=cv2.CascadeClassifier('support_files/haarcascade_frontalface_default.xml')
             cap=cv2.VideoCapture(0)
             while True:
-                print("capturing")
                 ret,img=cap.read()
                 gray=cv2.cvtColor(img,cv2.COLOR_BGR2GRAY)
-                face=face_cascade.detectMultiScale(gray,1.1,5)
-              
+                face=face_cascade.detectMultiScale(gray,1.3,5)
+                print(face)
                 for (x,y,w,h) in face:
                     roi_color=img[y:y+h,x:x+w]
                     cv2.imwrite(str(r'C:\\SEM7\\Project\\AutomaticAttendanceSystem\\registration_images\\Year' +
-                                 str(self.e3.text())+'\\'+str(self.e2.text())+'.png'),roi_color)
+                                    str(self.e3.text())+'\\'+str(self.e2.text())+'.png'),roi_color)
                 cv2.imshow('img',img)
                 k=cv2.waitKey(30) & 0xff
-                print("k is "+str(k))
                 if k==27:
                     break
             cap.release()
             cv2.destroyAllWindows()
             self.pic.setPixmap(QtGui.QPixmap(str(r'C:\\SEM7\\Project\\AutomaticAttendanceSystem\\registration_images\\Year' +
-                                 str(self.e3.text())+'\\'+str(self.e2.text())+'.png')))
-
+                                                str(self.e3.text())+'\\'+str(self.e2.text())+'.png')))
+                                             
     def store_in_database(self):
         #Function for storing information in database
         check_value = self.check()
@@ -157,14 +155,6 @@ class RegistrationWindow(QtGui.QMainWindow):
 
         if (check_value == 0):
             print("store in db")
-            # conn=sqlite3.connect('Attendance System.db')
-            # c=conn.cursor()
-            # c.execute('CREATE TABLE IF NOT EXISTS YEAR' + str(self.e3.text()) + ' (Roll INT, Name TEXT)')
-            # (name,regno,year)=(self.e1.text(),int(self.e2.text()),int(self.e3.text()))
-            # c.execute('INSERT INTO YEAR' + str(self.e3.text()) + ' (Roll,Name) VALUES(?,?)',(regno,name))
-            # conn.commit()
-            # c.close()
-            # conn.close()
             mydb = mysql.connector.connect(
                 host="localhost",
                 user="root",
@@ -176,19 +166,35 @@ class RegistrationWindow(QtGui.QMainWindow):
             mycursor.execute("SHOW TABLES")
             present = 0
             for i in mycursor:
-                if str(i) == "attendance":
+                if str(i) == str(self.e3.text()):
                     present = 1
                     break
             
             if present == 0:
                 try:
-                    mycursor.execute("CREATE TABLE Year{} (Roll INT, Name TEXT)".format(str(self.e3.text())),)
+                    mycursor.execute("CREATE TABLE Year{} (Roll INT, Name TEXT, year INT)".format(str(self.e3.text())),)
                     print("created")
                 except:
                     print("Some error")
 
-            
-            
+            student_name = str(self.e1.text())
+            student_roll_no = str(self.e2.text())
+            student_year = str(self.e3.text())
+            print("Inserting in database")
+
+            statement = 'INSERT INTO Year{} (Roll, Name, year) VALUES ({}, "{}", {})'.format(student_year, student_roll_no, student_name, student_year)
+            print(statement)
+            try:
+                mycursor.execute(statement)
+                mydb.commit()
+                print("Record inserted successfullt")
+            except mysql.connector.DatabaseError as e:
+                print(F"Accured Error: {e}")
+            finally:
+                if mycursor:
+                    mycursor.close()
+                if mydb:
+                    mydb.close()
             #Displaying message after successful submission 
             self.l4.setGeometry(QtCore.QRect(40,500,250,30))
             self.l4.setText("Successfully Registered")
@@ -234,9 +240,9 @@ class RegistrationWindow(QtGui.QMainWindow):
                                  str(self.e3.text())+'\\'+str(self.e2.text())+'.png', 0)
             print(img)
             face_cascade=cv2.CascadeClassifier('./support_files/haarcascade_frontalface_default.xml')
-            faces = face_cascade.detectMultiScale(img, 1.3, 5)
+            faces = face_cascade.detectMultiScale(img)
             print(faces)
-            print (len(faces), 'face(s) detected')
+            print(len(faces), 'face(s) detected')
             if (len(faces) != 1):
                 return 4
         except:
