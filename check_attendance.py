@@ -1,15 +1,12 @@
 from PyQt4 import QtGui,QtCore
-import sqlite3
+import mysql.connector
 import datetime
 
-
-conn=sqlite3.connect('Attendance System.db')
-c=conn.cursor()
- 
 class CheckAttendance(QtGui.QMainWindow):
-    def __init__(self,sub):
+    def __init__(self,sub, year):
         self.subject=sub
-        
+        self.year = year
+        print(self.subject, self.year)
         super(CheckAttendance, self).__init__()
         self.setGeometry(300,50,800,600)
         self.setWindowTitle("Check Attendance")
@@ -66,62 +63,50 @@ class CheckAttendance(QtGui.QMainWindow):
         self.text.setGeometry(40,170,720,350)
         self.text.setFont(font1)
 
-        #Default Display of Subject's Total Attendance on every date
-        xyear = (int(self.subject[2])+1)//2
-        query='SELECT * FROM YEAR{}'.format(xyear)
-        c.execute(query)
-        rolls = []
-        names = []
-        for row in c.fetchall():
-            rolls.append(row[0])
-            names.append(row[1])
-            
-        self.text.insertPlainText('Roll\tName\tAttendance %\n')
-                
-        for i in range(len(rolls)):
-            query='SELECT ['+ str(rolls[i]) + '] FROM {}'.format(self.subject)
-            print (query)
-            c.execute(query)
-            p = 0 #present
-            a = 0 #absent
-            for row in c.fetchall():
-                if (row[0] == 'P'):
-                    p += 1
-                else:
-                    a += 1
-            self.text.insertPlainText(str(rolls[i])+'\t'+str(names[i])+'\t'+str((100*p)/(p+a))+'\n')
-        
+        self.text.insertPlainText('Roll\Attendance Status\tName\n')
+
     def show_database(self):
+        mydb = mysql.connector.connect(
+                host="localhost",
+                user="root",
+                password="6989",
+                database="attendance"
+            )
+        mycursor = mydb.cursor()
         #To display attendance on specific date 
-        date=str(self.yyyy.value())+str(self.mm.value())+str(self.dd.value())
+        date= str(self.dd.value()) + "/" + str(self.mm.value()) + "/" + str(self.yyyy.value())
         self.text.clear()
-        temp = 'Roll\tName\t'+self.format_date(date)
+        temp = 'Roll\t'+date+"\tName"
         self.text.insertPlainText(temp+'\n')
         
-        xyear = (int(self.subject[2])+1)//2
-        query='SELECT * FROM YEAR{}'.format(xyear)
-        c.execute(query)
+        query='SELECT Roll, Name FROM Year{}'.format(self.year)
+        mycursor.execute(query)
         rolls = []
         names = []
-        for row in c.fetchall():
+        res = mycursor.fetchall()
+        for row in res:
             rolls.append(row[0])
             names.append(row[1])
                          
         for i in range(len(rolls)):
-            query='SELECT Date, ['+ str(rolls[i]) + '] FROM {} where Date = {}'.format(self.subject, date)
+            query='SELECT Status  FROM {} where Date = "{}" and Roll = {}'.format(self.subject, date, '\'"{}"\''.format(rolls[i]))
             print (query)
-            c.execute(query)
-            temp = str(rolls[i])+'\t'+str(names[i])+'\t'
-            for row in c.fetchall():
-                temp += (row[1])
+            res = []
+            try:
+                mycursor.execute(query)
+                res = mycursor.fetchall()
+                print(res)
+            except mysql.connector.DatabaseError as e:
+                print(F"Accured Error: {e}")
+
+            temp = str(rolls[i])+'\t'
+            for row in res:
+                print(row)
+                temp += (row[0])
+                temp+="\t"
+            temp += str(names[i])
             self.text.insertPlainText(temp+'\n')
             
-    def format_date(self, s):
-        year = s[:4]
-        month = s[4:6]
-        date = s[6:]
-        return date+'-'+month+'-'+year
-    
 if __name__ == '__main__':
     app = QtGui.QApplication([])
     gui = CheckAttendance()

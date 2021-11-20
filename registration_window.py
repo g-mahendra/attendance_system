@@ -1,6 +1,7 @@
 import cv2
 from PyQt4 import QtGui,QtCore
 import mysql.connector
+from attendance_window import AttendanceWindow
 
 class RegistrationWindow(QtGui.QMainWindow):
     #Registration window for student registration
@@ -107,7 +108,19 @@ class RegistrationWindow(QtGui.QMainWindow):
         b1.setGeometry(520,450,100,30)
         b1.setStyleSheet("QPushButton { background-color : green;color : white ; }")
         b1.clicked.connect(self.store_in_database)
-            
+
+        b1=QtGui.QPushButton(self)
+        b1.setText("Go to attendance window")
+        b1.setStyleSheet("QPushButton { background-color : #DDD;color : black ; }")
+        b1.setFont(font)
+        b1.setGeometry(520,500,250,30)
+        b1.clicked.connect(self.create_attendance_window)
+        
+    def create_attendance_window(self):
+        #Function for opening Attendance window
+        self._attendance_window = AttendanceWindow()
+        self._attendance_window.show()
+
     def erase(self):
         #function for clearing fields and changing to default
         for entry in self.entries:
@@ -134,7 +147,6 @@ class RegistrationWindow(QtGui.QMainWindow):
                 ret,img=cap.read()
                 gray=cv2.cvtColor(img,cv2.COLOR_BGR2GRAY)
                 face=face_cascade.detectMultiScale(gray,1.3,5)
-                print(face)
                 for (x,y,w,h) in face:
                     roi_color=img[y:y+h,x:x+w]
                     cv2.imwrite(str(r'C:\\SEM7\\Project\\AutomaticAttendanceSystem\\registration_images\\Year' +
@@ -151,10 +163,8 @@ class RegistrationWindow(QtGui.QMainWindow):
     def store_in_database(self):
         #Function for storing information in database
         check_value = self.check()
-        print ('>>', check_value)
 
         if (check_value == 0):
-            print("store in db")
             mydb = mysql.connector.connect(
                 host="localhost",
                 user="root",
@@ -174,20 +184,17 @@ class RegistrationWindow(QtGui.QMainWindow):
                 try:
                     mycursor.execute("CREATE TABLE Year{} (Roll INT, Name TEXT, year INT)".format(str(self.e3.text())),)
                     print("created")
-                except:
-                    print("Some error")
+                except mysql.connector.DatabaseError as e:
+                    print(F"Accured Error: {e}")
 
             student_name = str(self.e1.text())
             student_roll_no = str(self.e2.text())
             student_year = str(self.e3.text())
-            print("Inserting in database")
 
             statement = 'INSERT INTO Year{} (Roll, Name, year) VALUES ({}, "{}", {})'.format(student_year, student_roll_no, student_name, student_year)
-            print(statement)
             try:
                 mycursor.execute(statement)
                 mydb.commit()
-                print("Record inserted successfullt")
             except mysql.connector.DatabaseError as e:
                 print(F"Accured Error: {e}")
             finally:
@@ -238,11 +245,8 @@ class RegistrationWindow(QtGui.QMainWindow):
         try:
             img = cv2.imread(r'C:\\SEM7\\Project\\AutomaticAttendanceSystem\\registration_images\\Year' +
                                  str(self.e3.text())+'\\'+str(self.e2.text())+'.png', 0)
-            print(img)
             face_cascade=cv2.CascadeClassifier('./support_files/haarcascade_frontalface_default.xml')
             faces = face_cascade.detectMultiScale(img)
-            print(faces)
-            print(len(faces), 'face(s) detected')
             if (len(faces) != 1):
                 return 4
         except:

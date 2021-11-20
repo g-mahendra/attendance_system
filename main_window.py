@@ -55,13 +55,13 @@ class MainWindow(QtGui.QMainWindow):
         #Function for opening Registration window
         self._registration_window = RegistrationWindow()
         self._registration_window.show()
-        self.close()
+        # self.close()
         
     def create_attendance_window(self):
         #Function for opening Attendance window
         self._attendance_window = AttendanceWindow()
         self._attendance_window.show()
-        self.close()
+        # self.close()
 
 if __name__ == '__main__':
     app = QtGui.QApplication([])
