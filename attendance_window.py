@@ -95,38 +95,38 @@ class AttendanceWindow(QtGui.QMainWindow):
         self.mark()
 
     def record(self):
-        video = cv2.VideoCapture(0)
-        if (video.isOpened() == False): 
-            print("Error reading video file")
+        # video = cv2.VideoCapture(0)
+        # if (video.isOpened() == False): 
+        #     print("Error reading video file")
         
-        frame_width = int(video.get(3))
-        frame_height = int(video.get(4))
+        # frame_width = int(video.get(3))
+        # frame_height = int(video.get(4))
         
-        size = (frame_width, frame_height)
+        # size = (frame_width, frame_height)
         
-        result = cv2.VideoWriter("videos/{}.mp4".format(self.e2.text()), 
-                                cv2.VideoWriter_fourcc(*'MJPG'),
-                                10, size)
+        # result = cv2.VideoWriter("videos/{}.mp4".format(self.e2.text()), 
+        #                         cv2.VideoWriter_fourcc(*'MJPG'),
+        #                         10, size)
             
-        while(True):
-            ret, frame = video.read()
+        # while(True):
+        #     ret, frame = video.read()
         
-            if ret == True: 
+        #     if ret == True: 
         
-                result.write(frame)
+        #         result.write(frame)
         
-                cv2.imshow('Frame', frame)
+        #         cv2.imshow('Frame', frame)
         
-                if cv2.waitKey(1) & 0xFF == ord('s'):
-                    break
+        #         if cv2.waitKey(1) & 0xFF == ord('s'):
+        #             break
         
-            else:
-                break
+        #     else:
+        #         break
         
-        video.release()
-        result.release()
+        # video.release()
+        # result.release()
             
-        cv2.destroyAllWindows()
+        # cv2.destroyAllWindows()
         
         return
     
